@@ -1,0 +1,62 @@
+services:
+  llama-server:
+    image: ghcr.io/ggml-org/llama.cpp:full-cuda
+    container_name: llama-server
+    ports:
+      - "8081:8080"
+    environment:
+      - LLAMA_ARG_HOST=0.0.0.0
+      - LLAMA_ARG_MODEL=/models/gemma-4-E4B-it-qat-UD-Q4_K_XL.gguf
+      - LLAMA_ARG_CTX_SIZE=128000
+      - LLAMA_ARG_PORT=8080
+    command: ["--server"]
+    volumes:
+      - ./models:/models
+    deploy:
+      resources:
+        # limits:
+        #   # llama-server's --cache-ram defaults to 8192MiB (a prompt cache that grows with
+        #   # host RAM use); each model preset caps it explicitly (--cache-ram 3072), and the
+        #   # limit here is raised from 5g to 6g to leave room for that cap plus base usage.
+        #   memory: 6g
+        reservations:
+        #   memory: 2g
+          devices:
+            - driver: nvidia
+              device_ids: ["0"]
+              capabilities: [gpu]
+    restart: unless-stopped
+  hermes:
+    image: nousresearch/hermes-agent:latest
+    container_name: hermes
+    restart: unless-stopped
+    command: gateway run
+    ports:
+      - "9119:9119"
+    environment:
+      - HERMES_DASHBOARD=1
+      - HERMES_DASHBOARD_HOST=0.0.0.0
+      - HERMES_DASHBOARD_BASIC_AUTH_USERNAME=${HERMES_DASHBOARD_BASIC_AUTH_USERNAME:?set it in .env}
+      - HERMES_DASHBOARD_BASIC_AUTH_PASSWORD=${HERMES_DASHBOARD_BASIC_AUTH_PASSWORD:?set it in .env}
+      - SEARXNG_URL=http://searxng:8080
+    volumes:
+      - ./hermes-data/hermes:/opt/data
+      - ./hermes-data/web:/opt/hermes/web
+    depends_on:
+      - llama-server
+    deploy:
+      resources:
+        limits:
+          memory: 4g
+          cpus: "2"
+  searxng:
+    image: searxng/searxng:latest
+    container_name: searxng
+    ports:
+      - "8888:8080"
+    volumes:
+      - ./searxng:/etc/searxng:rw
+    environment:
+      - SEARXNG_BASE_URL=http://localhost:8888/
+      - SEARXNG_SECRET=${SEARXNG_SECRET:?set it in .env}
+    restart: unless-stopped
