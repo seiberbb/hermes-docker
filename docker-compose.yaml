@@ -6,10 +6,48 @@ services:
       - "8081:8080"
     environment:
       - LLAMA_ARG_HOST=0.0.0.0
-      - LLAMA_ARG_MODEL=/models/gemma-4-E4B-it-qat-UD-Q4_K_XL.gguf
-      - LLAMA_ARG_CTX_SIZE=128000
+      # - LLAMA_ARG_MODEL=/models/gemma-4-E4B-it-qat-UD-Q4_K_XL.gguf
+      # - LLAMA_ARG_MODEL=/models/Qwen3.8-27B-Q4_K_M.gguf
+      # - LLAMA_ARG_CTX_SIZE=64000
       - LLAMA_ARG_PORT=8080
-    command: ["--server"]
+    # command: [
+    #   "--server",
+    #   "--cache-type-k", "q4_0",
+    #   "--cache-type-v", "q4_0",
+    #   "--verbosity", "4"
+    #   ]
+    # command: [
+    #   "--server",
+    #   "-m", "/models/gpt-oss-20b-MXFP4.gguf",
+    #   "-c", "65536",
+    #   "-ngl", "99",
+    #   "-fa", "1",
+    #   "--cache-type-k", "q8_0",
+    #   "--cache-type-v", "q8_0",
+    #   "--jinja",
+    #   "-t", "8",
+    #   "--verbosity", "4"
+    # ]
+    command: ["--server",
+              "-m", "/models/Swift-1.5-Qwen3.8-27B-GSQ-RCO-IQ3_S-mtp.gguf",
+              "--jinja",
+              "-fa", "on",
+              "-ngl", "99",
+              "-c", "100000",
+              "--cache-type-k", "q4_0",
+              "--cache-type-v", "q4_0",
+              "--sleep-idle-seconds", "300",
+              "--verbosity", "4"
+    ]
+
+              # "--temp", "1.0",
+              # "--top-p", "0.95",
+              # "--top-k", "20",
+              # "--min-p", "0.0",
+              # "--presence-penalty", "0.0",
+              # "--repeat-penalty", "1.0"
+
+      # "-ngl", "20"
     volumes:
       - ./models:/models
     deploy:
@@ -38,7 +76,10 @@ services:
       - HERMES_DASHBOARD_HOST=0.0.0.0
       - HERMES_DASHBOARD_BASIC_AUTH_USERNAME=${HERMES_DASHBOARD_BASIC_AUTH_USERNAME:?set it in .env}
       - HERMES_DASHBOARD_BASIC_AUTH_PASSWORD=${HERMES_DASHBOARD_BASIC_AUTH_PASSWORD:?set it in .env}
+      - HERMES_UID=1000
+      - HERMES_GID=1000
       - SEARXNG_URL=http://searxng:8080
+      - TZ=America/New_York
     volumes:
       - ./hermes-data/hermes:/opt/data
       - ./hermes-data/web:/opt/hermes/web
