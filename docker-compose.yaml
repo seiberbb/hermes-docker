@@ -16,29 +16,34 @@ services:
     #   "--cache-type-v", "q4_0",
     #   "--verbosity", "4"
     #   ]
-    # command: [
-    #   "--server",
-    #   "-m", "/models/gpt-oss-20b-MXFP4.gguf",
-    #   "-c", "65536",
-    #   "-ngl", "99",
-    #   "-fa", "1",
-    #   "--cache-type-k", "q8_0",
-    #   "--cache-type-v", "q8_0",
-    #   "--jinja",
-    #   "-t", "8",
-    #   "--verbosity", "4"
-    # ]
-    command: ["--server",
-              "-m", "/models/Swift-1.5-Qwen3.8-27B-GSQ-RCO-IQ3_S-mtp.gguf",
-              "--jinja",
-              "-fa", "on",
-              "-ngl", "99",
-              "-c", "100000",
-              "--cache-type-k", "q4_0",
-              "--cache-type-v", "q4_0",
-              "--sleep-idle-seconds", "300",
-              "--verbosity", "4"
+    ## Use this for a 4GB or 6GB VRAM GPU or CPU only
+    command: [
+      "--server",
+      "-m", "/models/gpt-oss-20b-MXFP4.gguf",
+      "-c", "65536",
+      "-ngl", "99",
+      "--n-cpu-moe", "99",
+      "-fa", "1",
+      "--cache-type-k", "q8_0",
+      "--cache-type-v", "q8_0",
+      "--jinja",
+      # "-t", "8",
+      # "--temp", "0.2",
+      "--sleep-idle-seconds", "300",
+      "--verbosity", "4"
     ]
+    ## Use this for a 16GB VRAM GPU
+    # command: ["--server",
+    #           "-m", "/models/Swift-1.5-Qwen3.8-27B-GSQ-RCO-IQ3_S-mtp.gguf",
+    #           "--jinja",
+    #           "-fa", "on",
+    #           "-ngl", "99",
+    #           "-c", "100000",
+    #           "--cache-type-k", "q4_0",
+    #           "--cache-type-v", "q4_0",
+    #           "--sleep-idle-seconds", "300",
+    #           "--verbosity", "4"
+    # ]
 
               # "--temp", "1.0",
               # "--top-p", "0.95",
