@@ -24,11 +24,13 @@ services:
       "-ngl", "99",
       "--n-cpu-moe", "99",
       "-fa", "1",
-      "--cache-type-k", "q8_0",
-      "--cache-type-v", "q8_0",
       "--jinja",
+      # "--cache-type-k", "q8_0",
+      # "--cache-type-v", "q8_0",
+      "--top-p", "1.0",
+      "--temp", "1.0",
+      "--top-k", "0",
       # "-t", "8",
-      # "--temp", "0.2",
       "--sleep-idle-seconds", "300",
       "--verbosity", "4"
     ]
